@@ -9,7 +9,7 @@ jobs:
         environment:
           POSTGRES_USER: timetracker
           POSTGRES_DB: timetracker_test
-          POSTGRES_PASSWORD: ""
+          POSTGRES_PASSWORD: "password"
 
     steps:
       - checkout
