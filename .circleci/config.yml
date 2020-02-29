@@ -1,8 +1,12 @@
  version: 2
  jobs:
    build:
+     working_directory: ~/timetracker
      docker:
        - image: circleci/ruby:2.6.3
+       environment:
+                RAILS_ENV: test
      steps:
        - checkout
        - run: echo "A first hello"
+       - run: bundle exec rake
