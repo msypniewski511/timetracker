@@ -1,0 +1,18 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  # For details on connection pooling, see Rails configuration guide
+  # https://guides.rubyonrails.org/configuring.html#database-pooling
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+
+development:
+  <<: *default
+  database: timetracker_development
+test:
+  <<: *default
+  database: timetracker_test
+production:
+  <<: *default
+  database: timetracker_production
+  username: timetracker
+  password: <%= ENV['TIMETRACKER_DATABASE_PASSWORD'] %>
