@@ -1,0 +1,25 @@
+.col
+.col-md-6.col-md-offset-4.well.signin.margin-auto.text-center.bg-light
+  %h2.mb-3 Zaloguj sie
+  = form_for(resource, as: resource_name, url: session_path(resource_name)) do |f|
+    = devise_error_messages!
+    .input-group.mb-3
+      = f.email_field :email, class: "form-control input-lg", placeholder: "Email"
+      .input-group-append
+        %span.input-group-text
+          %i.far.fa-envelope
+    .input-group.mb-3
+      = f.password_field :password, class: "form-control input-lg", placeholder: "Hasło"
+      .input-group-append
+        %span.input-group-text
+          %i.fas.fa-lock
+
+    - if devise_mapping.rememberable?
+      .form-group
+        = f.check_box :remember_me
+        = f.label :remember_me, "Zapamiętaj mnie"
+    .actions
+      = f.submit "Zaloguj się", class: "btn btn-info btn-block btn-lg mb-3"
+  // = flash_messages layout_flash: false
+  = render "devise/shared/links"
+.col

@@ -5,11 +5,18 @@ jobs:
     working_directory: ~/timetracker
     docker:
       - image: circleci/ruby:2.6.3-node-browsers
-      - image: circleci/postgres:9.5
+        environment: # environment variables for primary container
+            BUNDLE_JOBS: 3
+            BUNDLE_RETRY: 3
+            BUNDLE_PATH: vendor/bundle
+            PGHOST: 127.0.0.1
+            PGUSER: circleci-timetracker
+            RAILS_ENV: test
+      - image: circleci/postgres:9.5-alpine
         environment:
-          POSTGRES_USER: circleci
-          POSTGRES_DB: circle_test
-          POSTGRES_PASSWORD: "password"
+          POSTGRES_USER: circleci-timetracker
+          POSTGRES_DB: timetracker_test
+          POSTGRES_PASSWORD: ""
 
     steps:
       - checkout
@@ -32,23 +39,29 @@ jobs:
           key: timetracker-dependency-cache-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
           paths:
             - vendor/bundle
+      # Only necessary if app uses webpacker or yarn in some other way
+      - restore_cache:
+          keys:
+            - timetracker-yarn-{{ checksum "yarn.lock" }}
+            - timetracker-yarn-
+
+      - run:
+          name: Yarn Install
+          command: yarn install --cache-folder ~/.cache/yarn
+
+      # Store yarn / webpacker cache
+      - save_cache:
+          key: rails-demo-yarn-{{ checksum "yarn.lock" }}
+          paths:
+            - ~/.cache/yarn
+
+
       - run:
           name: Wait for DB
           command: dockerize -wait tcp://localhost:5432 -timeout 1m
       - run:
           name: Database setup
-          command: |
-            mkdir -p config && echo 'test:
-                adapter: postgresql
-                encoding: unicode
-                database: timetracker_test
-                pool: 5
-                username: postgres
-                host: localhost
-              ' > config/database.yml
-            export RAILS_ENV="test"
-            export RACK_ENV="test"
-            bundle exec rake db:create db:schema:load --trace
+          command: bundle exec rake db:create db:schema:load --trace
       - type: shell
         command: |
           bundle exec rspec --profile 10 \

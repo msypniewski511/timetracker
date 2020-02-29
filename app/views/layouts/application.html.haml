@@ -11,8 +11,11 @@
     %header.container.mb-3
       %nav.navbar.navbar-light.bg-light
         = link_to "Time Tracker", root_path, class: "navbar-brand"
+        .pull-right.right-buttons
+          - if user_signed_in?
+            = link_to "Wyloguj się", destroy_user_session_path, method: 'delete', class: "btn btn-light navbar-btn"
     .container
-      - flash.each do |key, msg|
-        = content_tag :div, msg, id: "flash-#{key}"
+      
+      = flash_messages layout_flash: false
       .row
         = yield
