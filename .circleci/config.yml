@@ -7,8 +7,8 @@ jobs:
       - image: circleci/ruby:2.6.3-node-browsers
       - image: circleci/postgres:9.5
         environment:
-          POSTGRES_USER: root
-          POSTGRES_DB: timetracker_test
+          POSTGRES_USER: circleci
+          POSTGRES_DB: circle_test
           POSTGRES_PASSWORD: "password"
 
     steps:
