@@ -9,6 +9,7 @@ require 'factory_bot_rails'
 # FactoryBotRails.find_definitions
 require 'database_cleaner'
 require 'capybara/rspec'
+require 'pry'
 
 # Add additional requires below this line. Rails is not loaded until this point!
 

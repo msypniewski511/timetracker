@@ -3,12 +3,12 @@ module FormHelper
     content_tag(:small, form.object.errors[field].try(:first), class: "help-block")
   end
 
-  def form_group_for(form, field, &block)
+  def form_group_for(form, field, text=field, &block)
     has_errors = form.object.errors[field].present?
 
 
     content_tag :div, class: "form-group #{'is-invalid' if has_errors}" do
-      concat form.label(field, class: 'control-label')
+      concat form.label(text, class: 'control-label', for: field)
       concat capture(&block)
       concat errors_for(form, field)
     end

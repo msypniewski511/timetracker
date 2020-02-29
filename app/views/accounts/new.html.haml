@@ -4,18 +4,20 @@
       %h2 Utwórz konto
     .card-body
       = form_for @account do |f|
+        = f.fields_for :owner do |o|
+          = form_group_for o, :first_name, "Imie" do
+            = o.text_field :first_name, class: "form-control"
+          = form_group_for o, :last_name, "Nazwisko" do
+            = o.text_field :last_name, class: "form-control"
+          = form_group_for o, :email do
+            = o.text_field :email, class: "form-control"
+          = form_group_for o, :password, "Hasło" do
+            = o.text_field :password, class: "form-control"
+          = form_group_for o, :password_confirmation, "Potwierdzenie hasła" do
+            = o.text_field :password_confirmation, class: "form-control"
         .form-group
           = form_group_for f, :subdomain do
             = f.text_field :subdomain, class: "form-control"
             .input-group-append
               %span.input-group-text .timetracker.dev
-
-        -# .custom-file
-        -#   %input#customFile.custom-file-input{:type => "file"}/
-        -#   %label.custom-file-label{:for => "customFile"} Choose file
-        -# = form_group_for f, :subdomain do
-        -#   .input-group
-        -#     = f.text_field :subdomain, class: "form-control form-control-lg"
-        -#     .input-group-append
-        -#       %span.input-group-text .timetracker.dev
         = f.submit "Utwórz konto", class: "btn btn-primary"
