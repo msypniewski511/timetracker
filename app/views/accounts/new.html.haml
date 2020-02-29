@@ -10,11 +10,11 @@
           = form_group_for o, :last_name, "Nazwisko" do
             = o.text_field :last_name, class: "form-control"
           = form_group_for o, :email do
-            = o.text_field :email, class: "form-control"
+            = o.email_field :email, class: "form-control"
           = form_group_for o, :password, "Hasło" do
-            = o.text_field :password, class: "form-control"
+            = o.password_field :password, class: "form-control"
           = form_group_for o, :password_confirmation, "Potwierdzenie hasła" do
-            = o.text_field :password_confirmation, class: "form-control"
+            = o.password_field :password_confirmation, class: "form-control"
         .form-group
           = form_group_for f, :subdomain do
             = f.text_field :subdomain, class: "form-control"
