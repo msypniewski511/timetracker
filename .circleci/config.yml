@@ -5,7 +5,11 @@ jobs:
     working_directory: ~/timetracker
     docker:
       - image: circleci/ruby:2.6.3-node-browsers
-      - image: circleci/postgres:9.4
+      - image: circleci/postgres:9.5
+        environment:
+          POSTGRES_USER: timetracker
+          POSTGRES_DB: timetracker_test
+          POSTGRES_PASSWORD: ""
 
     steps:
       - checkout
@@ -29,7 +33,6 @@ jobs:
           paths:
             - vendor/bundle
       - run:
-          -e POSTGRES_PASSWORD=password
           name: Wait for DB
           command: dockerize -wait tcp://localhost:5432 -timeout 1m
       - run:
