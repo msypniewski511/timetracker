@@ -21,6 +21,7 @@ jobs:
       - run:
           name: Bundle Install
           command: |
+            gem install bundler:2.1.4
             bundle config without development:production
             bundle check --path=vendor/bundle || bundle install --path=vendor/bundle --jobs=3 --retry=3
       - save_cache:
