@@ -11,11 +11,18 @@
 
 
   <body>
-
-    <% flash.each do |key, msg| %>
-      <%= content_tag :div, msg, id: "flash-#{key}" %>
-    <% end %>
-
-    <%= yield %>
+    <header class="container mb-3">
+      <nav class="navbar navbar-light bg-light">
+      <%= link_to "Time Tracker", root_path, class: "navbar-brand" %>
+      </nav>
+    </header>
+    <div class="container">
+      <% flash.each do |key, msg| %>
+        <%= content_tag :div, msg, id: "flash-#{key}" %>
+      <% end %>
+      <div class="row">
+        <%= yield %>
+      </div>
+    </div>
   </body>
 </html>
