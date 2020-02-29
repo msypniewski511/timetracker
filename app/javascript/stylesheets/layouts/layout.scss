@@ -16,3 +16,15 @@ body {
   @extend .alert;
   @extend .alert-danger;
 }
+
+.form-group.is-invalid {
+  color: red;
+  .form-control {
+    @extend .is-invalid;
+  }
+
+  .input-group-append .input-group-text{
+    background-color: rgb(250, 91, 91);
+    border: red;;
+  }
+}

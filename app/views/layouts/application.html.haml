@@ -1,0 +1,18 @@
+!!!
+%html
+  %head
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+    %title Timetracker
+    = csrf_meta_tags
+    = csp_meta_tag
+    = stylesheet_pack_tag 'application', media: 'all'
+    = javascript_pack_tag 'application'
+  %body
+    %header.container.mb-3
+      %nav.navbar.navbar-light.bg-light
+        = link_to "Time Tracker", root_path, class: "navbar-brand"
+    .container
+      - flash.each do |key, msg|
+        = content_tag :div, msg, id: "flash-#{key}"
+      .row
+        = yield

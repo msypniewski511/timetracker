@@ -1,0 +1,21 @@
+.col-md-8.m-auto
+  .card
+    .card-header
+      %h2 Utwórz konto
+    .card-body
+      = form_for @account do |f|
+        .form-group
+          = form_group_for f, :subdomain do
+            = f.text_field :subdomain, class: "form-control"
+            .input-group-append
+              %span.input-group-text .timetracker.dev
+
+        -# .custom-file
+        -#   %input#customFile.custom-file-input{:type => "file"}/
+        -#   %label.custom-file-label{:for => "customFile"} Choose file
+        -# = form_group_for f, :subdomain do
+        -#   .input-group
+        -#     = f.text_field :subdomain, class: "form-control form-control-lg"
+        -#     .input-group-append
+        -#       %span.input-group-text .timetracker.dev
+        = f.submit "Utwórz konto", class: "btn btn-primary"
