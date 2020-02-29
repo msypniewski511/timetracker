@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="rspec" tests="19" skipped="0" failures="0" errors="0" time="0.390770" timestamp="2020-02-29T22:57:01+00:00" hostname="maciej-laptop.dom.com">
+<properties>
+<property name="seed" value="55253"/>
+</properties>
+<testcase classname="spec.features.account_creation_spec" name="account creation allows user to ceate account" file="./spec/features/account_creation_spec.rb" time="0.091809"></testcase>
+<testcase classname="spec.features.authentication_spec" name="user authentication allows signin with valid credentials" file="./spec/features/authentication_spec.rb" time="0.059776"></testcase>
+<testcase classname="spec.features.authentication_spec" name="user authentication does not allows signin with invalid credentials" file="./spec/features/authentication_spec.rb" time="0.032304"></testcase>
+<testcase classname="spec.features.authentication_spec" name="user authentication allows user to sign out" file="./spec/features/authentication_spec.rb" time="0.049635"></testcase>
+<testcase classname="spec.models.account_spec" name="Account validations is expected to validate that :owner cannot be empty/falsy" file="./spec/models/account_spec.rb" time="0.004498"></testcase>
+<testcase classname="spec.models.account_spec" name="Account validations is expected to validate that :subdomain cannot be empty/falsy" file="./spec/models/account_spec.rb" time="0.005228"></testcase>
+<testcase classname="spec.models.account_spec" name="Account validations is expected to validate that :subdomain is case-insensitively unique" file="./spec/models/account_spec.rb" time="0.007975"></testcase>
+<testcase classname="spec.models.account_spec" name="Account validations is expected to allow :subdomain to be ‹&quot;bolrand&quot;›" file="./spec/models/account_spec.rb" time="0.002422"></testcase>
+<testcase classname="spec.models.account_spec" name="Account validations is expected to allow :subdomain to be ‹&quot;test&quot;›" file="./spec/models/account_spec.rb" time="0.002262"></testcase>
+<testcase classname="spec.models.account_spec" name="Account validations is expected not to allow :subdomain to be ‹&quot;www&quot;›" file="./spec/models/account_spec.rb" time="0.002587"></testcase>
+<testcase classname="spec.models.account_spec" name="Account validations is expected not to allow :subdomain to be ‹&quot;WWW&quot;›" file="./spec/models/account_spec.rb" time="0.002128"></testcase>
+<testcase classname="spec.models.account_spec" name="Account validations is expected not to allow :subdomain to be ‹&quot;.test&quot;›" file="./spec/models/account_spec.rb" time="0.002260"></testcase>
+<testcase classname="spec.models.account_spec" name="Account validations is expected not to allow :subdomain to be ‹&quot;test/&quot;›" file="./spec/models/account_spec.rb" time="0.004355"></testcase>
+<testcase classname="spec.models.account_spec" name="Account validations should validate case insensitive uniqueness" file="./spec/models/account_spec.rb" time="0.010477"></testcase>
+<testcase classname="spec.models.account_spec" name="Account associations is expected to belong to owner required: true" file="./spec/models/account_spec.rb" time="0.003004"></testcase>
+<testcase classname="spec.models.user_spec" name="User validation is expected to validate that :first_name cannot be empty/falsy" file="./spec/models/user_spec.rb" time="0.005089"></testcase>
+<testcase classname="spec.models.user_spec" name="User validation is expected to validate that :last_name cannot be empty/falsy" file="./spec/models/user_spec.rb" time="0.015226"></testcase>
+<testcase classname="spec.models.user_spec" name="User validation is expected to validate that :email cannot be empty/falsy" file="./spec/models/user_spec.rb" time="0.005229"></testcase>
+<testcase classname="spec.models.user_spec" name="User validation is expected to validate that :password cannot be empty/falsy" file="./spec/models/user_spec.rb" time="0.003910"></testcase>
+</testsuite>
