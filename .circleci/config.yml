@@ -98,6 +98,4 @@ workflows:
   version: 2
   jobs:
     - build
-    - deploy:
-          requires:
-            - build
+    - deploy
