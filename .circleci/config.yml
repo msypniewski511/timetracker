@@ -1,73 +1,113 @@
 version: 2
 jobs:
-  build:
-    parallelism: 3
-    working_directory: ~/timetracker
+  setup:
     docker:
       - image: circleci/ruby:2.6.3-node-browsers
-        environment: # environment variables for primary container
-            BUNDLE_JOBS: 3
-            BUNDLE_RETRY: 3
-            BUNDLE_PATH: vendor/bundle
-            PGHOST: 127.0.0.1
-            PGUSER: circleci-timetracker
-            RAILS_ENV: test
-      - image: circleci/postgres:9.5-alpine
-        environment:
-          POSTGRES_USER: circleci-timetracker
-          POSTGRES_DB: timetracker_test
-          POSTGRES_PASSWORD: ""
-
     steps:
       - checkout
-      - add_ssh_keys
+
+      - run: gem update --system
+      - run: gem install bundler
+
       - restore_cache:
           keys:
-            - timetracker-dependency-cache-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
-            - timetracker-dependency-cache-{{ .Branch }}-
-            - timetracker-dependency-cache-
-      - run:
-          name: Export env
-          command: echo -e "export RAILS_ENV=test\nexport RACK_ENV=test" >> $BASH_ENV
-      - run:
-          name: Bundle Install
-          command: |
-            gem install bundler:2.1.4
-            bundle config without development:production
-            bundle check --path=vendor/bundle || bundle install --path=vendor/bundle --jobs=3 --retry=3
+            - bundle-{{ checksum "Gemfile.lock" }}
+      - run: bundle install --path vendor/bundle
       - save_cache:
-          key: timetracker-dependency-cache-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
+          key: bundle-{{ checksum "Gemfile.lock" }}
           paths:
             - vendor/bundle
-      # Only necessary if app uses webpacker or yarn in some other way
+
       - restore_cache:
           keys:
-            - timetracker-yarn-{{ checksum "yarn.lock" }}
-            - timetracker-yarn-
-
-      - run:
-          name: Yarn Install
-          command: yarn install --cache-folder ~/.cache/yarn
-
-      # Store yarn / webpacker cache
+            - yarn-{{ checksum "yarn.lock" }}
+      - run: yarn install --cache-folder ~/.cache/yarn
       - save_cache:
-          key: rails-demo-yarn-{{ checksum "yarn.lock" }}
+          key: yarn-{{ checksum "yarn.lock" }}
           paths:
             - ~/.cache/yarn
 
-
+      - run: bundle exec rake webpacker:compile
+      - save_cache:
+          key: webpack-{{ .Revision }}
+          paths:
+            - /home/circleci/project/public/packs-test/
+  test:
+    docker:
+      - image: circleci/ruby:2.6.3-node-browsers
+        environment:
+          DATABASE_URL: postgresql://postgres:secret@localhost:5432
+      - image: circleci/postgres:11
+        environment:
+          POSTGRES_USER: circleci-timetracker
+          POSTGRES_DB: timetracker_test
+          POSTGRES_PASSWORD: secret
+    parallelism: 2
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - webpack-{{ .Revision }}
+      - restore_cache:
+          keys:
+            - bundle-{{ checksum "Gemfile.lock" }}
+      - run: gem update --system
+      - run: gem install bundler
+      - run: bundle install --path vendor/bundle
+      - run: sudo apt install postgresql-client
+      - run: dockerize -wait tcp://localhost:5432 -timeout 1m
+      - run: bundle exec rake db:create
+      - run: bundle exec rake db:schema:load
       - run:
-          name: Wait for DB
-          command: dockerize -wait tcp://localhost:5432 -timeout 1m
+          name: Additional checks
+          command: |
+              if [ $CIRCLE_NODE_INDEX = 0 ]; then
+                bundle exec bundle-audit update
+                bundle exec bundle-audit check
+              elif [ $CIRCLE_NODE_INDEX = 1 ]; then
+                bin/rubocop
+              fi
       - run:
-          name: Database setup
-          command: bundle exec rake db:create db:schema:load --trace
-      - type: shell
-        command: |
-          bundle exec rspec --format progress \
-                --format RspecJunitFormatter \
-                --out /tmp/test-results/rspec.xml \
-                --format progress \
-                $(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)
+          name: Specs
+          command: |
+            TESTFILES=$(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)
+            bundle exec rspec $TESTFILES --profile 10 --format RspecJunitFormatter --out ~/spec-timings/rspec.xml --format progress
       - store_test_results:
-          path: test_results
+          path: ~/spec-timings
+  deploy:
+    docker:
+      - image: buildpack-deps:trusty
+    steps:
+      - checkout
+      - run:
+          name: Deploy to Heroku
+          command: |
+            cat >~/.netrc <<EOF
+            machine api.heroku.com
+              login $HEROKU_EMAIL
+              password $HEROKU_API_KEY
+            machine git.heroku.com
+              login $HEROKU_EMAIL
+              password $HEROKU_API_KEY
+            EOF
+            chmod 600 ~/.netrc
+            curl https://cli-assets.heroku.com/install.sh | sh
+            git push https://heroku:$HEROKU_API_KEY@git.heroku.com/rails-app.git master
+            heroku run rake db:migrate -a rails-app
+          no_output_timeout: 10m
+
+workflows:
+  version: 2
+  setup_and_test:
+    jobs:
+      - setup
+      - test:
+          requires:
+            - setup
+            workflows:
+      - deploy:
+          requires:
+            - test
+          filters:
+            branches:
+              only: master
