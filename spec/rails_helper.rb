@@ -36,6 +36,9 @@ rescue ActiveRecord::PendingMigrationError => e
   puts e.to_s.strip
   exit 1
 end
+
+Capybara.app_host = 'http://example.com'
+
 RSpec.configure do |config|
   config.include Rails.application.routes.url_helpers
   config.include Capybara::DSL
