@@ -1,6 +1,6 @@
 class ApplicationController < ActionController::Base
  
-  before_action :validate_subdomain, :load_schema, :authenticate_user!
+  before_action :load_schema, :authenticate_user!
   before_action :configure_permitted_parameters, if: :devise_controller?
 
   private
@@ -14,6 +14,7 @@ class ApplicationController < ActionController::Base
       # Apartment::Tenant.switch!('public')
       Apartment::Tenant.reset
       return unless request.subdomain.present?
+
       account = Account.where(subdomain: request.subdomain).first
       if account
         Apartment::Tenant.switch!(request.subdomain)
@@ -26,7 +27,7 @@ class ApplicationController < ActionController::Base
       new_user_session_path
     end
 
-    def validate_subdomain
-      Account.where(subdomain: request.subdomain).first
-    end
+    # def validate_subdomain
+    #   redirect_to welcome_root_path unless Account.where(subdomain: request.subdomain).first
+    # end
 end

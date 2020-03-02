@@ -15,6 +15,6 @@ describe "subdomians" do
   
   it "redirects invalid account" do
     visit root_url(subdomain: 'random-subdomain')
-    expect(page.current_url).to_not include('random-subdomain') 
+    expect(page).to have_content('Strona, której szukasz, nie istnieje.')
   end
 end
