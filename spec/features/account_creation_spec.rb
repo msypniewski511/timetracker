@@ -1,21 +1,35 @@
 require 'spec_helper'
 
 describe 'account creation' do
+  let(:subdomain) { FactoryBot.generate(:subdomain) }
+  before(:each) { sign_up(subdomain) }
+
   it 'allows user to ceate account' do
-    visit root_path
-    click_link 'Utwórz konto'
-
-    
-    # binding.pry
-    fill_in "account_owner_attributes_first_name",	with: "sometext" 
-    fill_in "account_owner_attributes_last_name",	with: "Sypniewski"
-    fill_in "account_owner_attributes_email",	with: "test@test.pl"
-    fill_in "account_owner_attributes_password",	with: "password"
-    fill_in "account_owner_attributes_password_confirmation",	with: "password"
-    fill_in "account_subdomain",	with: "kasia"
-    click_button "Utwórz konto"
-
-
-    expect(page).to have_content('Rejestracja została zakończona pomyślnie') 
+    # expect(page).to have_content('Rejestracja została zakończona pomyślnie') 
+    expect(page.current_url).to include(subdomain)
+    expect(Account.all.count).to eq(1) 
   end
+
+  it 'allows access to subdomain' do
+    visit root_url(subdomain: subdomain)
+    expect(page.current_url).to include(subdomain)
+  end
+
+  it "does not allow account creation on subdomain" do
+    subdomain = FactoryBot.generate(:subdomain)
+    sign_up(subdomain)
+    user = User.first
+    sign_in_user(user, subdomain: subdomain)
+    expect { visit new_account_url(subdomain: subdomain) }.to raise_error ActionController::RoutingError
+  end
+
+  it 'allows account folloup creation' do
+    Apartment::Tenant.reset
+    DatabaseCleaner.clean
+    subdomain5 = "#{subdomain}5"
+    sign_up(subdomain5)
+    expect(page.current_url).to include(subdomain5)
+    expect(Account.all.count).to eq(2) 
+  end
+
 end
