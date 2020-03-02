@@ -10,77 +10,49 @@ require 'factory_bot_rails'
 require 'database_cleaner'
 require 'capybara/rspec'
 require 'pry'
+require 'support/macros'
 
-# Add additional requires below this line. Rails is not loaded until this point!
-
-# Requires supporting ruby files with custom matchers and macros, etc, in
-# spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
-# run as spec files by default. This means that files in spec/support that end
-# in _spec.rb will both be required and run as specs, causing the specs to be
-# run twice. It is recommended that you do not name files matching this glob to
-# end with _spec.rb. You can configure this pattern with the --pattern
-# option on the command line or in ~/.rspec, .rspec or `.rspec-local`.
-#
-# The following line is provided for convenience purposes. It has the downside
-# of increasing the boot-up time by auto-requiring all files in the support
-# directory. Alternatively, in the individual `*_spec.rb` files, manually
-# require only the support files necessary.
-#
-# Dir[Rails.root.join('spec', 'support', '**', '*.rb')].each { |f| require f }
-
-# Checks for pending migrations and applies them before tests are run.
-# If you are not using ActiveRecord, you can remove these lines.
 begin
   ActiveRecord::Migration.maintain_test_schema!
 rescue ActiveRecord::PendingMigrationError => e
   puts e.to_s.strip
   exit 1
 end
+
+Capybara.app_host = 'http://example.com'
+
 RSpec.configure do |config|
   config.include Rails.application.routes.url_helpers
   config.include Capybara::DSL
-  # # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
-  # config.fixture_path = "#{::Rails.root}/spec/fixtures"
 
-  # # If you're not using ActiveRecord, or you'd prefer not to run each of your
-  # # examples within a transaction, remove the following line or assign false
-  # # instead of true.
-  # config.use_transactional_fixtures = true
-
-  # # RSpec Rails can automatically mix in different behaviours to your tests
-  # # based on their file location, for example enabling you to call `get` and
-  # # `post` in specs under `spec/controllers`.
-  # #
-  # # You can disable this behaviour by removing the line below, and instead
-  # # explicitly tag your specs with their type, e.g.:
-  # #
-  # #     RSpec.describe UsersController, type: :controller do
-  # #       # ...
-  # #     end
-  # #
-  # # The different available types are documented in the features, such as in
-  # # https://relishapp.com/rspec/rspec-rails/docs
-  # config.infer_spec_type_from_file_location!
-
-  # # Filter lines from Rails gems in backtraces.
-  # config.filter_rails_from_backtrace!
-  # # arbitrary gems may also be filtered via:
-  # # config.filter_gems_from_backtrace("gem name")
   config.include FactoryBot::Syntax::Methods
   # config.include Devise::TestHelpers, type: :controller
-  config.order = "random"
+  # config.order = "random"
 
   config.before(:suite) do
     DatabaseCleaner.strategy = :transaction
     DatabaseCleaner.clean_with(:truncation)
   end
 
+  config.before(:suite) do
+    # Clean all tables to start
+    DatabaseCleaner.clean_with :truncation
+    # Use transactions for tests
+    DatabaseCleaner.strategy = :transaction
+    # Truncating doesn't drop schemas, ensure we're clean here, app *may not* exist
+    Apartment::Tenant.drop('app') rescue nil
+    # Create the default tenant for our tests
+  end
+
   config.before(:each) do
+    Apartment::Tenant.switch!
     DatabaseCleaner.start
   end
 
   config.after(:each) do
     DatabaseCleaner.clean
+    Apartment::Tenant.reset
+    drop_schemas
   end
 
   Shoulda::Matchers.configure do |config|
@@ -89,4 +61,5 @@ RSpec.configure do |config|
       with.library :rails
     end
   end
+
 end

@@ -12,8 +12,7 @@ gem 'puma', '~> 4.1'
 gem 'rails', '~> 6.0.2', '>= 6.0.2.1'
 gem 'sass-rails', '>= 6'
 gem 'webpacker', '~> 4.0'
-
-
+gem 'apartment', github: 'influitive/apartment', branch: 'development'
 gem 'rubocop', require: false
 
 group :development, :test do
